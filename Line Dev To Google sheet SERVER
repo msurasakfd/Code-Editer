@@ -1,25 +1,18 @@
-var CHANNEL_ACCESS_TOKEN = 'TOKEN'; 
-var sheet_url = "https://docs.google.com/spreadsheets/d/xxxxxxxxxxxxxxxxxxxxxxxx/edit";
-
-var sheet_name = "ชีต1";
+var CHANNEL_ACCESS_TOKEN = 'TOKEN Line Dev';
 var line_endpoint = 'https://api.line.me/v2/bot/message/reply';
 
-
 function doPost(e) {
-  var json = JSON.parse(e.postData.contents);
-
-  
+  var json = JSON.parse(e.postData.contents);  
   var reply_token= json.events[0].replyToken;
   if (typeof reply_token === 'undefined') {
     return;
   }
-
  
   var message = json.events[0].message.text;
   var userId = JSON.parse(e.postData.contents).events[0].source.userId;
   var username = getUsername(userId);
 
-  var reply_txt = GetReply(message);
+  var reply_txt = message;
 
   UrlFetchApp.fetch(line_endpoint, {
     'headers': {
@@ -36,40 +29,7 @@ function doPost(e) {
     }),
   });
   
-
   return ContentService.createTextOutput(JSON.stringify({'content': 'post ok'})).setMimeType(ContentService.MimeType.JSON);
-}
-
-
-function GetReply(message){
-  var spreadsheet = SpreadsheetApp.openByUrl(sheet_url);
-  var sheet = spreadsheet.getSheetByName(sheet_name);
-  var lr = sheet.getLastRow();
-
- 
-  var message_col=1;
-  var reply_col=2;
-  var start_row=2;
-
-  
-  var reply_txt="";
-  for (var i = start_row; i <= lr+1; i++){
-    
-   
-    if (i == lr+1){
-      var reply_txt=message
-    }
-    
-    var temp_txt = sheet.getRange(i,message_col).getValue();   
-    Logger.log(temp_txt);
-    if (message == temp_txt){
-      var reply_txt = sheet.getRange(i,reply_col).getValue(); 
-      break; 
-    }
-    
-  };
-  
-  return reply_txt;
 }
 
 function getUsername(userId) {
